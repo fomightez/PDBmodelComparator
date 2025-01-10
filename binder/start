@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# clean up / declutter a bit ;
+# this will make it easier to see the files produced
+rm -rf binder
+rm README.md
+rm LICENSE
+rem .gitignore
+
+
+# this must be last line according to 
+# https://repo2docker.readthedocs.io/en/latest/config_files.html#start-run-code-before-the-user-sessions-starts
+exec "$@"

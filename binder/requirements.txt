@@ -1,0 +1,16 @@
+numpy
+pandas
+unipressed
+uv
+matplotlib
+biopython
+seaborn
+scipy
+statsmodels
+pytest
+nbgitpuller
+openpyxl
+sh
+rich
+
+
