@@ -14,8 +14,8 @@ Click any `launch binder` badge on this page to use the series of notebooks insi
 
 A launchable, working Jupyter-based environment served via MyBinder.org that has a collection of demonstrations of tool to generate an overviews between models of related macromolecular structures available in the Protein Data Bank.
 
-If you have two or more models of essentially the same structure and are wondering which one has the information you seek, this tool is for you. It allows you to update the summaries as more related structures are solved.
-Compares things like missing residues per chain, missing segments, percent of the biological chain oberved in the structure, whether data for either or both chain termini is intact. Additionally, it makes a separate summary of which structure has the most of a each chain represented.
+If you have two or more models of essentially the same large complex and are wondering which one has the information you seek, this tool is for you. It allows you to update the summaries as more related structures are solved.
+Compares things like missing residues per chain, missing segments, percent of the biological chain oberved in the structure, whether data for either or both chain termini is intact. Additionally, it makes a separate summary of which chain in the complex has the most of a each chain represented.
 It allows you to quickly & programmatically update the summaries as more related structures are solved.
 The information incorporated can be customized with addiitonal knowledge as part of the process to make more informative summaries. Meaning you can incorporate your own expert /domain-specific knowledge to make the summaries even more useful in your own research group.
 
