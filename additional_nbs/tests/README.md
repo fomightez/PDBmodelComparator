@@ -1,0 +1,17 @@
+# Sub-directory for the tests associated with PDBmodelComparator
+
+This is 'Techincal'-related topic and not for you if you are just looking to explore macromolecular complexes...
+
+These sub-directory houses the tests and associated files for running those to keep aspects of the PDBmodelComparator in check using pytest.
+
+#### Tests for `missing_residue_detailer.py`
+
+One of the main parts of the PDBmodelComparator is the script `missing_residue_detailer.py`. This script runs at the start of PDBmodelComparator use and is expected to give the same details about missing residues as you'd get if you opened [FirstGlance in Jmol](https://www.bioinformatics.org/firstglance/fgij/) and selected to have it give you infromation detailing missing residues.  
+These tests are meant to verify that indeed the script `missing_residue_detailer.py` and [FirstGlance in Jmol](https://www.bioinformatics.org/firstglance/fgij/) give the same results for a few PDB entries.  
+See [the notebook itself 'Jupyter Notebook testing if output of utility script `missing_residue_detailer.py` makes same content as FirstGlance in Jmol'](additional_nbs/test_missing_residue_detailer.ipynb) for details and testing.  
+
+Note, my original draft of what became the PDBmodelComparator used hand-copied HTML/text sourced from running Eric Martz's FirstGlance in Jmol. And while I could probably have developed a way to use Selenium or similar tool to collect the data from FirstGlance in Jmol, such a solution may end up being brittle. Plus, such a solution isn't that portable and it wouldn't work easily in WASM. (I sort of hope the PDBmodelComparator could be converted to use JupyterLite as the computation demands are not that demanding, most of the components I know work with it already, such as Pandas & pytest [see https://pyodide.org/en/stable/usage/packages-in-pyodide.html], and MyBinder-session availability can be an issue at this time with it being down to two federation members.) So making my own recapitulation of that code in FirstGLance in Jmol's `moltab.js` seems reasonable. My attempt at that is `missing_residue_detailer.py` And for making sure I can easily verify `missing_residue_detailer.py` makes the same output as I could obtain from FirstGlance in Jmol seems like a great task where I can employ pytest to make sure I am on track. Eric Martz's comments in FirstGLance in Jmol's `moltab.js` code harbors a nice collection of PDB entries that necessitated adjustments to his own code regarding the missing reside section REMARK 465. Therefore, working with pytest would allow me to easily scale to test as much of the data associated with as many PDB identitifer codes as I'd like. Plus, if FirstGlance in Jmol's output ever changes, I can use this to work out what would be involved in changing my code and/or assess if it is worth to keep consistent with FirstGlance in Jmol's if PDBmodelComparator is still working.  
+All that boils down to the concern for now being keeping `missing_residue_detailer.py` consistent with what Eric's code makes. I leave this notebook here for testing the script `missing_residue_detailer.py` in a way that it can easily be run later by myself or others if things change or issues arise.
+
+## Quick-Link -- Related Notebook (or Notebooks?):
+- [(Technical) Jupyter Notebook testing if output of utility script `missing_residue_detailer.py` makes same content as FirstGlance in Jmol](additional_nbs/test_missing_residue_detailer.ipynb)
