@@ -25,7 +25,7 @@ missingresiduedetailer_hmtl_prefix = "fmrd_html_"
 #
 firstglanceinjmol_text_file_prefix = "fgij_text_"
 missingresiduedetailer_text_prefix = "fmrd_text_"
-suffix_4_results = "_missing_residue_details.txt" # Has to match what 
+suffix_4_results = "_missing_residue_details.html" # Has to match what 
 # `missing_residue_detailer.py` has for this.
 
 
