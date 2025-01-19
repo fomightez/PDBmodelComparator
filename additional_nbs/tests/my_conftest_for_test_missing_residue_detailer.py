@@ -5,6 +5,10 @@
 # I don't won't poorly named file so putting most of actual content dictating
 # what `conftest.py` should do & generate in here and directing `conftest.py` to
 # utilize this.
+# Note that because it isn't part of the HTML table, I don't bother testing the 
+# top line of the report because I focus on table HTML that is easy to 
+# specifically collect. I ned to set things up so that will be thee case and it
+# is easist to do using conftest step where I am making the output to test.
 
 import pytest
 import os
@@ -65,12 +69,83 @@ TEST_FILES_DIR = "additional_nbs/tests/"
 fgij_4dqo_main_table_html = '''<table cellpadding="2"><tbody><tr><td>Chain(s)</td><td>Missing<br>Residues</td><td>Missing<br>Charges*</td><td>Segment Ranges</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>246</b> residues of Protein including 2 <a href="javascript: showLigNSRHelp()">non-standard residue(s)</a> (no <a href="http://proteopedia.org/wiki/index.php/Selenomethionine" target="_blank">selenomethonine</a> [MSE]):</center></td></tr><tr><td> H</td><td><center>6</center></td><td><font color="red">1-</font>, 0+</td><td>217-222</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>216</b> residues of Protein:</center></td></tr><tr><td> L</td><td><center>2</center></td><td>0</td><td>211-212</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>124</b> residues of Protein:</center></td></tr><tr><td> C</td><td><center>36</center></td><td><font color="red">7-</font>, 0+</td><td>118-118, 143-152, 178-178P, 239-246</td></tr></tbody></table>'''
 fgij_6w6v_main_table_html = '''<table cellpadding="2"><tbody><tr><td>Chain(s)</td><td>Missing<br>Residues</td><td>Missing<br>Charges*</td><td>Segment Ranges</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>340</b> residues of RNA:</center></td></tr><tr><td> A</td><td><center>46</center></td><td>&nbsp;</td><td>1-1, 53-56, 132-143, 170-173, 203-207, 220-224, 242-246, 285-289, 336-340</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>875</b> residues of Protein:</center></td></tr><tr><td> B</td><td><center>95</center></td><td><font color="red">7-</font>, <font color="blue">16+</font></td><td>1-70, 125-137, 692-694, 741-749</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>279</b> residues of Protein:</center></td></tr><tr><td> D</td><td><center>67</center></td><td><font color="red">10-</font>, <font color="blue">11+</font></td><td>1-67</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>173</b> residues of Protein:</center></td></tr><tr><td> E</td><td><center>4</center></td><td><font color="red">3-</font>, 0+</td><td>1-1, 171-173</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>158</b> residues of Protein:</center></td></tr><tr><td> F</td><td><center>0</center></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>140</b> residues of Protein:</center></td></tr><tr><td> G</td><td><center>14</center></td><td><font color="red">3-</font>, <font color="blue">2+</font></td><td>1-5, 107-115</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>133</b> residues of Protein:</center></td></tr><tr><td> H</td><td><center>8</center></td><td><font color="red">1-</font>, <font color="blue">2+</font></td><td>1-3, 129-133</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>293</b> residues of Protein:</center></td></tr><tr><td> J</td><td><center>0</center></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td> I</td><td><center>50</center></td><td><font color="red">7-</font>, <font color="blue">7+</font></td><td>244-293</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>198</b> residues of Protein:</center></td></tr><tr><td> K</td><td><center>119</center></td><td><font color="red">14-</font>, <font color="blue">24+</font></td><td>1-2, 82-198</td></tr><tr><td colspan="4" bgcolor="#d8d8d8"><center><b>201</b> residues of Protein:</center></td></tr><tr><td> L</td><td><center>80</center></td><td><font color="red">11-</font>, <font color="blue">19+</font></td><td>54-60, 129-201</td></tr></tbody></table>'''
 
-# make a dicitonary to match the content to the PDB id. Key is PDB accession
-# code and the values are the string the HTML stored in
+# make a dictionary to match the content to the PDB id. Key is PDB accession
+# code and the values are the string the HTML stored in.
+# Originally this was hardcoded like the docstring section below
+'''
 fgij_correspondences_dict = {
                             '6w6v':fgij_6w6v_main_table_html, 
                             '4dqo':fgij_4dqo_main_table_html
                             }
+'''
+# However, it would be better for making it easier to expand with addition of more main table html content if automated making this. This does that:
+def create_fgij_dict():
+    """
+    Creates a dictionary mapping PDB IDs to their corresponding HTML table strings
+    by finding all variables in the global scope that match the pattern
+    'fgij_XXXX_main_table_html' where XXXX is the PDB ID.
+    
+    Returns:
+        dict: Dictionary with PDB IDs as keys and HTML strings as values
+
+    THIS MAKES IT MUCH EASIER TO ADD MORE EXAMPLES OF `fgih_XXXX_main_table_html` 
+    like fgij_4dqo_main_table_html` docstrings because just have to add them and 
+    then everything else to test what the script will make from the same PDB id
+    will be done automatically.  
+    """
+    # Get variables from global scope
+    all_vars = list(globals().items())
+    
+    # Find variables matching our pattern
+    fgij_dict = {}
+    for var_name, value in all_vars:
+        if var_name.startswith('fgij_') and var_name.endswith('_main_table_html'):
+            pdb_id = var_name.replace('fgij_', '').replace('_main_table_html', '')
+            if len(pdb_id) == 4:
+                fgij_dict[pdb_id] = value
+    
+    return fgij_dict
+fgij_correspondences_dict = create_fgij_dict()
+# Note original hardcoded way I define `fgij_correspondences_dict` early on is just above this.
+
+# from Eric Martz's FirstGlance in Jmol moltab.js, the section from there that is below could be used to expand the tests to be more representative:
+'''
+// missingPerChainInfo 2D array format
+// 2D array format: chain name, missing count, missneg, misspos,
+// Each missing sequence range segment has 4 values:
+//   firstseq, firstseq-insertion-code, lastseq, lastseq-insertion-code
+//
+// Test cases:
+// 2jqo none missing (NMR).
+// 1nzp 1nzp: A 1 241 241 (single residue missing)
+// 1o9a 1o9a: B 12 1 12 (CHAIN A, SEQDIFF FROM B, HAS NONE MISSING)
+// EXAMPLE NEEDED: CHAIN WITH NONE MISSING SEQID TO CHAIN WITH SOME MISSING.
+// 4asw 4asw: ["A", 13, 1, 13] ["B", 13, 1, 13]  ["C", 4, 16, 19]
+//    total all chains: 30
+// ABOVE EXAMPLES HAVE ONLY ONE MISSING SEGMENT PER CHAIN
+// BELOW HAVE >ONE MISSING SEGMENT PER CHAIN
+// 2ace 2ace: A 10 1 3 485 489 536 537 ONE CHAIN
+// 1d66 1d66: A 9 1 7 65 66, B 9 1 7 5 66 TWO CHAINS
+//
+// 1tzn: 28 chains, 140 missing residues in 14 chains.
+// 3fic: 27 chains, 27 missing residues in 1 chain.
+// 3jqo=3JQO: 42 chains (3 distinct), 635 missing residues (32, 5, 8 per chain).
+//   VARIABLE MISSING IN 2 OF 3 CHAINS.
+// 3lo3: 28 chains (1 distinct), 0 missing residues. TWO CHAIN LINES.
+//
+// 4hix has 1 residue numbered 0 missing in chain L.
+// 4en3 has missing with neg seq nums and 0.
+// 2lex has missing DNA (2-letter residue names).
+// 4ifd has missing RNA (1-letter residue names) among 435 missing residues
+//   in 12 distinct chains <====== good xmpl of table simplifying.
+// 4dqo has missing amino acids with INSERTION CODES.
+// 1ucy has missing amino acids with INSERTION CODES in REVERSE alpha order!
+//   also has a missing residue in just 1 of 3 seqID chains!
+// 3nn8 has 2 sets of seqID chains, each set has some missing, some not.
+// 4gxu has 926 missing AA - good xmpl of table simplifying! <==========
+// 4dep has 174 missing AA, many negs, good xmpl of table simplifying! <==========
+// 3omz has chain G length 259 with 156 missing (more than half!)
+'''
 
 #
 #*******************************************************************************
@@ -110,7 +185,30 @@ def write_string_to_file(s, fn):
     with open(fn, 'w') as output_file:
         output_file.write(s)
 
+def remove_text_up_to_string(file_path, target_string):
+    '''
+    self-explanatory function to remove everything before the supplied string
+    '''
+    with open(file_path, 'r') as file:
+        content = file.read()
+    index = content.find(target_string)
+    if index != -1:
+        # Just use index, not index + len(target_string)
+        new_content = content[index:]
+        with open(file_path, 'w') as file:
+            file.write(new_content)
 
+def trim_to_HTML_table(fn_made_by_script):
+    '''
+    takes a string with the name of the html file made by the script `missing_residue_detailer.py` and takes off everything in front of the first
+    occurence of the text `<table ` to leave just the missing residues HTML file that
+    is easy to collect and check against.
+
+    Though this means the line like at the start of output for 6w6v that is `
+    483 Missing Residues` won't get checked, it isn't a big deal and that data 
+    that number is composed of gets checked in HTML table.
+    '''
+    remove_text_up_to_string(fn_made_by_script, "<table ")
 
 
 #import the shared helper function from `conftest.py`
@@ -188,6 +286,14 @@ for pdb_id, corr_html_string in fgij_correspondences_dict.items():
     if not os.path.isfile(TEST_FILES_DIR + file_needed): #only make the 
         # file if haven't already
         os.system(f'python missing_residue_detailer.py {pdb_id}')
+        # Remove everything from the output that is prior to `<table `. This way
+        # the test that will come are focused on the HTML table that is easy to 
+        # collect and not the first part of the report, which is really just the
+        # total of the missing residies and so is redundant with information
+        # in the HTML table. As it probably be clearer with an example: 
+        # basically, aside some boiler plate text, the only thing it gets rid 
+        # of is the line `483 Missing Residues` ,for the case of 6w6v.
+        trim_to_HTML_table(pdb_id + suffix_4_results)
         move(pdb_id + suffix_4_results, current_script_html_fn) # rename to what is needed for tests
     
         # Convert html from script to in-memory text. BEFORE MOVING HTML FILE. (And this won't work if made and moved file above already so place it under control of that conditional)

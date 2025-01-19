@@ -19,6 +19,9 @@ from bs4 import BeautifulSoup
 # more portable to script detailing missing residues myself than use slenium or
 # something along those lines to handle getting missing residue information from
 # Eric Martz's FirstGlance in Jmol.
+# Note that because it isn't part of the HTML table, I don't bother testing the 
+# top line of the report because I focus on table HTML that is easy to 
+# specifically collect. Handling of making it perform like this was done in `my_conftest_for_test_missing_residue_detailer.py`.
 
 
 #*******************************************************************************
