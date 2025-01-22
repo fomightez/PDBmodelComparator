@@ -138,6 +138,9 @@ def test_pytest_working_and_can_pass_fixtures_from_conftest_to_test_file(html_pa
     assert isinstance(html_pairs_to_process, list) 
     assert isinstance(text_pairs_to_process, list) 
 
+# This next test tests that a file with the proper name convention can be 
+# supplied as souce of input data as instead of fetching PDB file header from 
+# Protein Data Bank
 def test_file_can_be_used_as_source(dir_2_put_test_files):  # Add the fixtures as parameters
     # I added later the ability to supply a file as the source the header. This 
     # should test that as it uses a PDB id code that does not exist and so the 
