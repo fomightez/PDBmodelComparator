@@ -16,6 +16,7 @@ import fnmatch
 import filecmp
 from bs4 import BeautifulSoup
 from shutil import move
+from shutil import copy
 
 
 #*******************************************************************************
@@ -31,7 +32,8 @@ firstglanceinjmol_text_file_prefix = "fgij_text_"
 missingresiduedetailer_text_prefix = "fmrd_text_"
 suffix_4_results = "_missing_residue_details.html" # Has to match what 
 # `missing_residue_detailer.py` has for this.
-
+file_input_suffix = "_header4missing.txt" # Has to match what 
+# `missing_residue_detailer.py` has for this.
 
 #
 #*******************************************************************************
@@ -185,6 +187,25 @@ def generate_filename_from_prefix_andPDBid(prefix,pdb_id):
         extension = "txt"
     return f"{prefix}{pdb_id}.{extension}"
 
+def fetch_pdbheader_using_requests(pdb_id):
+    """
+    Take a PDB accession code and return the PDB file header using RCSB's Direct file access server with CORS headers
+    See https://www.wwpdb.org/ftp/pdb-ftp-sites
+
+    Version of `fetch_pdbheader()` from above but with requests and because
+    happens to have CORS headers enabled is more universal & works for outside of 
+    MyBinder-served sessions, even WASM! Both ipykernel & pyodide-compatible. 
+    Works on JupyterLite for `4dqo` and other ones that seem to fail via 
+    MyBinder tonight, ands o always test with JupyterLite because may just be an 
+    issue with the remote site and large responses. Small ones like `1d66` and 
+    `1crn` and `1trn` were working in both places tonight.
+    Would it work even better for large ones using the API like covered at https://data.rcsb.org/#data-api ?
+    """
+    url = f'https://files.rcsb.org/header/{pdb_id.upper()}.pdb'
+    response = requests.get(url, allow_redirects=True)
+    response.raise_for_status()  # Raise an exception for non-200 status codes
+    return response.text
+
 def write_string_to_file(s, fn):
     '''
     Takes a string, `s`, and a name for a file & writes the string to the file.
@@ -242,15 +263,39 @@ example_datasets_location = get_example_datasets_location()
 
 # Set up
 #--------------------------------------------------------------------------#
-# Set-up for the tests that will be done below
-# First make the text files needed for the First Glance in Jmol content that I 
+# Set-up for the tests that will be done in the corresponding test file.
+#**                                                                      **#
+# First, get a header for a structure and save it as a file to be used in a test
+# as to whether the script will recognize and use a text file supplied in the 
+# expected way as the source of the information to be used. In this case the
+# header to be used is from 1d66 but the PDB id code the file will have will be
+# a non-existent one. So the only way the script will produce output is if it
+# uses the supplied file. It cannot get the header from network because doesn't
+# exist. Since using content corresponding to 1d66, output should look like 1d66
+# PREP FOR `test_file_can_be_used_as_source`
+source_data_for_file_read_test = '1d66_PDB_header_text_to_test_file_reading.txt'
+PDB_code_for_file_read_test = "0rId" # This PDB doesn't presently exist, even if
+# account for case insensitivity, see footnote to the statement " This could be increased to 466,560 if the numeral "0" is allowed as the first character[3]" at https://proteopedia.org/wiki/index.php/PDB_code#Limited_Number_of_4-Character_PDB_Codes.
+# Because that one doesn't exist. The only data that will be valid is if use my
+# supplied file as source.
+file_needed = PDB_code_for_file_read_test + file_input_suffix
+if not os.path.isfile(file_needed): #only supply the file if haven't already
+    copy(TEST_FILES_DIR + source_data_for_file_read_test, file_needed)
+output_expected = PDB_code_for_file_read_test.lower() + suffix_4_results
+os.system(
+    f'python missing_residue_detailer.py {PDB_code_for_file_read_test}')
+#trim_to_HTML_table(output_expected) # see about trim_to_HTML_table below; may need here if I update related test to check content
+move(output_expected,  TEST_FILES_DIR +output_expected) # move expected to 
+# location of test files
+# Now that used when run script, can move file used to test to back to
+# the location of test files
+move(file_needed, TEST_FILES_DIR + file_needed)
+
+# Second, make the text files needed for the First Glance in Jmol content that I 
 # have.
+# PREP FOR `test_text_files_match` and `test_html_files_match`
 # Then make the corresponding files for those with the results from  
 # `missing_residue_detailer.py`
-#
-# THIS NEEDS TO BE moved to `conftest.py`, like used for 
-# https://github.com/fomightez/Fasta2Structure-cli 
-
 html_pairs_to_process_list = [] # this will be a list of the two element tuples 
 # the HTML files to compare for the tests
 text_pairs_to_process_list = [] # this will be a list of the two element tuples 

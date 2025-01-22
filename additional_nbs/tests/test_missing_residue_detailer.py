@@ -23,6 +23,11 @@ from bs4 import BeautifulSoup
 # top line of the report because I focus on table HTML that is easy to 
 # specifically collect. Handling of making it perform like this was done in `my_conftest_for_test_missing_residue_detailer.py`.
 
+# To do yet:
+# -possibly when more mature, update `test_file_can_be_used_as_source` to test
+# it matches the HTML made by `missing_residue_detailer.py ` for 1d66 since that 
+# header used. For now, `test_file_can_be_used_as_source` just makes sure there
+# is output, which is mostly all that is needed for that test. Mostly.
 
 #*******************************************************************************
 ##################################
@@ -91,55 +96,6 @@ def write_string_to_file(s, fn):
 
 
 
-def make_corresponding_GUIobtained_filename(file_name):
-    '''
-    Takes a filename and makes it match pattern I used to name things in `results_observed_from_original_with_Example_data` based on names in `Example_data/Datasets`
-    Specific example
-    ================
-    Calling function with
-        ("ITS.fas")
-    returns
-        "from_ITS.fas_Structure.str"
-    '''
-    return "from_{}_Structure.str".format(file_name)
-
-def make_corresponding_GUIobtained_logname(file_name):
-    '''
-    Takes a filename and makes it match pattern I used to name things in `results_observed_from_original_with_Example_data` based on names in `Example_data/Datasets`
-    Specific example
-    ================
-    Calling function with
-        ("ITS.fas")
-    returns
-        "from_ITS.fas_log.log"
-    '''
-    return "from_{}_log.log".format(file_name)
-
-def read_and_process_file4content_check(file_path):
-    '''
-    read file for content check
-    '''
-    processed_data = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            parts = [part for part in line.split() if part]
-            if parts:
-                processed_data.append(parts)
-    return processed_data
-
-def compare_files_content(file1_path, file2_path):
-    '''
-    Compare content ignoring whitespace differences
-    '''
-    data1 = read_and_process_file4content_check(file1_path)
-    data2 = read_and_process_file4content_check(file2_path)
-
-    assert len(data1) == len(data2), f"Files have different number of lines: {len(data1)} vs {len(data2)}"
-
-    for i, (line1, line2) in enumerate(zip(data1, data2), 1):
-        assert line1 == line2, f"Difference found at line {i}:\nFile 1: {' '.join(line1)}\nFile 2: {' '.join(line2)}"
-
-    return True  # If we get here, the files are identical in content
 
 def compare_file_content_equality(file1_path, file2_path, msg="Files are not identical in content, ignoring whitespace differences."):
     '''
@@ -150,116 +106,12 @@ def compare_file_content_equality(file1_path, file2_path, msg="Files are not ide
     '''
     assert compare_files_content(file1_path, file2_path), msg
 
-def parse_number_FASTA_selected(file_path):
-    '''
-    parse out number of files selected
-    '''
-    with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-        log_content=file.read()
-        return log_content.split("FASTA files selected.",1)[0].split()[-1].strip()
-
-def extract_tag(file_path, process_number):
-    '''
-    from the content that will be in a log file of runs of the fasta2structure 
-    example data get the 'tag' from the file base name I can use to match the 
-    corresponding input data. The process number is the step number for logs
-    made with more than one input file as part of the input.
-    For example, for `Example_data/Datasets/ITS.fas`,
-    the tag is `ITS.fas`.
-
-    Except thete is an issue with the `log.log` that Adam Bessa provides
-    in `Example_data/Results/`.
-    These are the corresponding tags/names of FASTA file there and so I'll add 
-    special handling for those since they don't conform to all the others.
-    Avicennia-ITS_Phase.fas', 'Avicennia-trnD-trnT_ediphase.fas', 'Avicennia-trnH-trnK_editphase.fas
-    '''
-    with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-        log_content=file.read()
-        if 'Avicennia-' in log_content:
-            return log_content.split(".fas",process_number)[process_number-1].split("Avicennia-")[1].split("_",1)[0]+".fas"
-        else:
-            return log_content.split(".fas",process_number)[process_number-1].split("/")[-1]+".fas"
-
-def parse_variable_sites_info(file_path,process_number):
-    '''
-    parse out the variable sites string corresponding to the step number 
-    (process_number) of such data in the log text content for where there is 
-    more than one input file when the script is called.
-    '''
-    with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-        log_content=file.read()
-        return "["+log_content.split("[",process_number)[process_number].split("]")[0]+"]"
-
-def compare_log_info(file1_path, file2_path):
-    '''
-    Compare number of number of FASTA files selected and variable sites info in 
-    two specified log files
-    '''
-    # parse out number of files selected
-    sel1 = parse_number_FASTA_selected(file1_path)
-    sel2 = parse_number_FASTA_selected(file2_path)
-
-    assert sel1 == sel2, f"Files have different number of FASTA files selected: {sel1} vs {sel2}"
-
-    # There will be a number of variable sites information to compare equal to the number of files selected
-    # make a dictionary to relate the names/tag for each one so matching the same
-    # parse out variable sites information. One for file1 and one for file2.
-    # Note that the dictonary is made with the 'tag' from the name of the input
-    # file as key so the actual order of occurence/listing in the log file 
-    # content won't matter for the comparison.
-    tag_and_variable_sites_f1 = {}
-    tag_and_variable_sites_f2 = {}
-    for i in range(int(sel1)):
-        tag1 = extract_tag(file1_path,i+1)
-        tag_and_variable_sites_f1[tag1] = parse_variable_sites_info(file1_path, i+1)
-        tag2 = extract_tag(file2_path,i+1)
-        tag_and_variable_sites_f2[tag2] = parse_variable_sites_info(file2_path, i+1)
-
-    # sanity check: the number of keys should match sel1 and keys in the 
-    # dictionary should be same.
-    assert len(tag_and_variable_sites_f1) == int(sel1), f"The length of the dictionary keys old example logs, {len(tag_and_variable_sites_f1)}, for the file name tags should be the same as the number of FASTA files input into the log, {sel1}."
-    assert len(tag_and_variable_sites_f2) == int(sel1), f"The length of the dictionary keys for current example logs, {len(tag_and_variable_sites_f2)}, for the file name tags should be the same as the number of FASTA files input into the log, {sel1}."
-    assert len(tag_and_variable_sites_f1) == len(tag_and_variable_sites_f2), f"The number of the dictionary keys for current example logs, {len(tag_and_variable_sites_f2)}, for the file name tags should be the same as the value for length of the dictionary keys for current example logs, {len(tag_and_variable_sites_f2)}."
-    assert tag_and_variable_sites_f1.keys() == tag_and_variable_sites_f2.keys(), f"The keys in the two dictionaries should match."
 
 
-    # Now iterate on the dictionary and compare the variable sites for each tag.
-    # Because the tags were used for the dictionary the actual order of the 
-    # content appearing in the logs is moot. It is just checking the associated
-    # data from the same input file matches.
-    for fastafile,vs1 in tag_and_variable_sites_f1.items():
-        vs2 = tag_and_variable_sites_f2[fastafile]
-
-        assert vs1 == vs2, f"Files have different details for variable sites concerning the `{fastafile}` pair: {sel1} vs {sel2}"
-
-    return True  # If we get here, the files have same FASTA file number and variable sites info
-
-
-
-def compare_file_number_and_variable_sites_in_log(file1_path, file2_path, msg="Files are not identical in content, ignoring whitespace differences."):
-    '''
-    Compare number of number of FASTA files selected and variable sites info in 
-    two specified log files
-
-    Has a default assertion message, but you can pass your own string as third
-    argument in call or only pass the two paths and use the default.
-    '''
-    assert compare_log_info(file1_path, file2_path), msg
-
-
-
-#import the shared helper function from `conftest.py`
-#from conftest import make_corresponding_GUIobtained_filename
-
-# import the function that gives string `example_datasets_location` because cannot
-# use a pytest fixture to pass this one since used in `@pytest.mark.parametrize()`
-# that seemed incompatible with fixtures
-'''
-from conftest import get_example_datasets_location
-example_datasets_location = get_example_datasets_location()
-'''
 ###--------------------------END OF HELPER FUNCTIONS--------------------------###
 ###--------------------------END OF HELPER FUNCTIONS--------------------------###
+
+
 
 
 
@@ -285,6 +137,31 @@ def test_pytest_working_and_can_pass_fixtures_from_conftest_to_test_file(html_pa
     assert dir_2_put_test_files == "additional_nbs/tests/" 
     assert isinstance(html_pairs_to_process, list) 
     assert isinstance(text_pairs_to_process, list) 
+
+def test_file_can_be_used_as_source(dir_2_put_test_files):  # Add the fixtures as parameters
+    # I added later the ability to supply a file as the source the header. This 
+    # should test that as it uses a PDB id code that does not exist and so the 
+    # only way it will run to work and produce anything is if it uses the file
+    # I supplied as source of header. (It cannot fall back to fetching & using 
+    # something from Protein Data Bank.) Since using content corresponding to 
+    # 1d66, output should look like what I expect for 1d66 output, which is 
+    # among the PDB id codes tested below, but as written for now tests just 
+    # makes sure output of some sort made by script.
+    PDB_code_for_file_read_test = "0rId"
+    suffix_4_results = "_missing_residue_details.html" # Has to match what 
+    # `missing_residue_detailer.py` has for this.
+    file_input_suffix = "_header4missing.txt" # Has to match what 
+    # `missing_residue_detailer.py` has for this.
+    file_used_as_input = PDB_code_for_file_read_test + file_input_suffix
+    output_expected = PDB_code_for_file_read_test.lower() + suffix_4_results
+    assert os.path.isfile(TEST_FILES_DIR + output_expected), \
+        f"The expected file ouput {dir_2_put_test_files + output_expected} made using {file_used_as_input} as input does not exist"
+    # the file used as input should also now be in the test files and have 1d66
+    # header as content. Next assert test it at least the file is there.
+    assert os.path.isfile(TEST_FILES_DIR + file_used_as_input), \
+        f"The file {file_used_as_input} does not seem to have been moved back to the test location?"
+    # FUTURE IMPROVEMENT: add when script more mature to see if content in `output_expected` matches HTML made by script for 1d66?
+
 
 # Get & Iterate on each pair and check if the text without HTML matches. Because
 # if that fails, surely the more detailed HTML will fail.
@@ -383,4 +260,3 @@ def test_html_files_match(pair_index, dir_2_put_test_files):
     file1, file2 = pairs[pair_index]
     assert filecmp.cmp(dir_2_put_test_files + file1, dir_2_put_test_files + file2, shallow=False), \
         f"Files {dir_2_put_test_files + file1} and {dir_2_put_test_files + file2} do not have identical content"
-
