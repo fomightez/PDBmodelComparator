@@ -150,7 +150,7 @@ def test_file_can_be_used_as_source(dir_2_put_test_files):  # Add the fixtures a
     # 1d66, output should look like what I expect for 1d66 output, which is 
     # among the PDB id codes tested below, but as written for now tests just 
     # makes sure output of some sort made by script.
-    PDB_code_for_file_read_test = "4tSt"
+    PDB_code_for_file_read_test = "4tSt" # "4tst is a useful PDB id for a non-existing structure"-https://proteopedia.org/wiki/index.php/Believe_It_or_Not
     suffix_4_results = "_missing_residue_details.html" # Has to match what 
     # `missing_residue_detailer.py` has for this.
     file_input_suffix = "_header4missing.txt" # Has to match what 
