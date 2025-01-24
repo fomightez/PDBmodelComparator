@@ -326,8 +326,13 @@ example_datasets_location = get_example_datasets_location()
 # exist. Since using content corresponding to 1d66, output should look like 1d66
 # PREP FOR `test_file_can_be_used_as_source`
 source_data_for_file_read_test = '1d66_PDB_header_text_to_test_file_reading.txt'
-PDB_code_for_file_read_test = "0rId" # This PDB doesn't presently exist, even if
-# account for case insensitivity, see footnote to the statement " This could be increased to 466,560 if the numeral "0" is allowed as the first character[3]" at https://proteopedia.org/wiki/index.php/PDB_code#Limited_Number_of_4-Character_PDB_Codes.
+PDB_code_for_file_read_test = "4tSt" # This PDB doesn't exist according to 
+# https://proteopedia.org/wiki/index.php/Believe_It_or_Not 
+# "4tst is a useful PDB id for a non-existing structure", even if
+# account for case insensitivity. This dummy PDB id code seems better than using 
+# zero in front of alphanumerics as initially did, see footnote to the statement 
+# " This could be increased to 466,560 if the numeral "0" is allowed as the 
+# first character[3]" at https://proteopedia.org/wiki/index.php/PDB_code#Limited_Number_of_4-Character_PDB_Codes.
 # Because that one doesn't exist. The only data that will be valid is if use my
 # supplied file as source.
 file_needed = PDB_code_for_file_read_test + file_input_suffix
