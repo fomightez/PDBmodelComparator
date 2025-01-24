@@ -187,24 +187,27 @@ def generate_filename_from_prefix_andPDBid(prefix,pdb_id):
         extension = "txt"
     return f"{prefix}{pdb_id}.{extension}"
 
-def fetch_pdbheader_using_requests(pdb_id):
-    """
-    Take a PDB accession code and return the PDB file header using RCSB's Direct file access server with CORS headers
-    See https://www.wwpdb.org/ftp/pdb-ftp-sites
+def get_using_curl(script_needed):
+    '''
+    Use curl which will work on MyBinder sessions where I plan to do the testing
+    for now.
+    Might not work if I shift to JupyterLite and so having this modularized in
+    this way will make it easier to shift later
+    '''
+    if not os.path.isfile(script_needed):
+        os.system("curl -OL https://raw.githubusercontent.com/"\
+            "fomightez/structurework/refs/heads/master/"\
+            f"PDBmodelComparator-utilities/{script_needed}")
+def get_script_if_needed(script_needed):
+    '''
+    fetch script if needed
 
-    Version of `fetch_pdbheader()` from above but with requests and because
-    happens to have CORS headers enabled is more universal & works for outside of 
-    MyBinder-served sessions, even WASM! Both ipykernel & pyodide-compatible. 
-    Works on JupyterLite for `4dqo` and other ones that seem to fail via 
-    MyBinder tonight, ands o always test with JupyterLite because may just be an 
-    issue with the remote site and large responses. Small ones like `1d66` and 
-    `1crn` and `1trn` were working in both places tonight.
-    Would it work even better for large ones using the API like covered at https://data.rcsb.org/#data-api ?
-    """
-    url = f'https://files.rcsb.org/header/{pdb_id.upper()}.pdb'
-    response = requests.get(url, allow_redirects=True)
-    response.raise_for_status()  # Raise an exception for non-200 status codes
-    return response.text
+    `curl` may not work and so by having a generic function I can use in 
+    multiple places in the same script, I only need to change this script to
+    handle the change to another method in multiple places.
+    '''
+    get_using_curl(script_needed)
+    
 
 def write_string_to_file(s, fn):
     '''
@@ -282,12 +285,14 @@ file_needed = PDB_code_for_file_read_test + file_input_suffix
 if not os.path.isfile(file_needed): #only supply the file if haven't already
     copy(TEST_FILES_DIR + source_data_for_file_read_test, file_needed)
 output_expected = PDB_code_for_file_read_test.lower() + suffix_4_results
+script_needed = "missing_residue_detailer.py"
+get_script_if_needed(script_needed) # needed soon & so grab if not present yet
 os.system(
     f'python missing_residue_detailer.py {PDB_code_for_file_read_test}')
 #trim_to_HTML_table(output_expected) # see about trim_to_HTML_table below; may need here if I update related test to check content
 move(output_expected,  TEST_FILES_DIR +output_expected) # move expected to 
 # location of test files
-# Now that used when run script, can move file used to test to back to
+# Now that used when run script, can move file used to test to BACK to
 # the location of test files
 move(file_needed, TEST_FILES_DIR + file_needed)
 
@@ -329,10 +334,7 @@ for pdb_id, corr_html_string in fgij_correspondences_dict.items():
     current_script_text_fn = generate_filename_from_prefix_andPDBid(
         missingresiduedetailer_text_prefix,pdb_id)
     script_needed = "missing_residue_detailer.py"
-    if not os.path.isfile(script_needed):
-        os.system("curl -OL https://raw.githubusercontent.com/"\
-            "fomightez/structurework/refs/heads/master/"\
-            f"PDBmodelComparator-utilities/{script_needed}")
+    get_script_if_needed(script_needed) # needed soon & so grab if not here yet
     #make each result, and then move both to `TEST_FILES_DIR`
     file_needed = current_script_html_fn
     if not os.path.isfile(TEST_FILES_DIR + file_needed): #only make the 
