@@ -13,6 +13,8 @@
 import pytest
 import os
 import fnmatch
+import urllib3
+import certifi
 import filecmp
 from bs4 import BeautifulSoup
 from shutil import move
@@ -198,6 +200,53 @@ def get_using_curl(script_needed):
         os.system("curl -OL https://raw.githubusercontent.com/"\
             "fomightez/structurework/refs/heads/master/"\
             f"PDBmodelComparator-utilities/{script_needed}")
+
+def get_content_atURL_with_URLLIB3(url, chunk_size=64):
+    '''
+    Get content with the urllib3 library, which offers more advanced retry and 
+    streaming capabilities than Requests.
+    And works in JupyterLite.
+    '''
+    http = urllib3.PoolManager(
+        cert_reqs='CERT_REQUIRED',
+        ca_certs=certifi.where(),
+        retries=urllib3.Retry(
+            total=3,
+            backoff_factor=0.1,
+            status_forcelist=[500, 502, 503, 504]
+        )
+    )
+    try:
+        response = http.request('GET', url, preload_content=False)
+        collected = ''
+        chunk_count = 0
+        while True:
+            chunk = response.read(chunk_size)
+            if not chunk:
+                break
+            chunk_count += 1
+            collected += chunk.decode(errors='ignore')
+        response.release_conn()
+        return collected, chunk_count
+    except urllib3.exceptions.ChunkedEncodingError as ex:
+        print(f"Specific ChunkedEncodingError: {ex}")
+        return collected, chunk_count
+    except Exception as ex:
+        print(f"General error: {ex}")
+        return None, 0
+def get_script_using_URLLIB3(script_needed):
+    '''
+    Get script using the urllib3 library, which offers more advanced retry and 
+    streaming capabilities than Requests.
+    And works in JupyterLite.
+    '''
+    if not os.path.isfile(script_needed):
+        url = ("https://raw.githubusercontent.com/fomightez/structurework/master"
+        "/PDBmodelComparator-utilities/"+script_needed)
+        r_text, _ = get_content_atURL_with_URLLIB3(url)
+        with open(script_needed, 'w') as filehandler:
+            filehandler.write(r_text)
+
 def get_script_if_needed(script_needed):
     '''
     fetch script if needed
@@ -206,8 +255,8 @@ def get_script_if_needed(script_needed):
     multiple places in the same script, I only need to change this script to
     handle the change to another method in multiple places.
     '''
-    get_using_curl(script_needed)
-    
+    #get_using_curl(script_needed)
+    get_script_using_URLLIB3(script_needed)
 
 def write_string_to_file(s, fn):
     '''
