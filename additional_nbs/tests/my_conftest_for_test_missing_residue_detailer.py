@@ -18,7 +18,7 @@ import certifi
 import filecmp
 from bs4 import BeautifulSoup
 from shutil import move
-from shutil import copy
+from shutil import copyfile
 
 
 #*******************************************************************************
@@ -337,7 +337,7 @@ PDB_code_for_file_read_test = "4tSt" # This PDB doesn't exist according to
 # supplied file as source.
 file_needed = PDB_code_for_file_read_test + file_input_suffix
 if not os.path.isfile(file_needed): #only supply the file if haven't already
-    copy(TEST_FILES_DIR + source_data_for_file_read_test, file_needed)
+    copyfile(TEST_FILES_DIR + source_data_for_file_read_test, file_needed)
 output_expected = PDB_code_for_file_read_test.lower() + suffix_4_results
 script_needed = "missing_residue_detailer.py"
 get_script_if_needed(script_needed) # needed soon & so grab if not present yet
