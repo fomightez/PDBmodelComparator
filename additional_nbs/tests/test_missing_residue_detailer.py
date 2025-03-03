@@ -148,8 +148,11 @@ def test_file_can_be_used_as_source(dir_2_put_test_files):  # Add the fixtures a
     # I supplied as source of header. (It cannot fall back to fetching & using 
     # something from Protein Data Bank.) Since using content corresponding to 
     # 1d66, output should look like what I expect for 1d66 output, which is 
-    # among the PDB id codes tested below, but as written for now tests just 
-    # makes sure output of some sort made by script.
+    # among the PDB id codes tested below, and so testing the content making 
+    # part of the script will get handled there but this will at least test 
+    # there is output file as expected if used file as input. In other words, as 
+    # written the test for prioritizing reading a file just makes sure output 
+    # of some sort made by script.
     PDB_code_for_file_read_test = "4tSt" # "4tst is a useful PDB id for a non-existing structure"-https://proteopedia.org/wiki/index.php/Believe_It_or_Not#Notes & 
     # https://proteopedia.org/wiki/index.php/4tst
     suffix_4_results = "_missing_residue_details.html" # Has to match what 
