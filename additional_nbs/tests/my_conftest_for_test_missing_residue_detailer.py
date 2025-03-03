@@ -327,7 +327,8 @@ example_datasets_location = get_example_datasets_location()
 # PREP FOR `test_file_can_be_used_as_source`
 source_data_for_file_read_test = '1d66_PDB_header_text_to_test_file_reading.txt'
 PDB_code_for_file_read_test = "4tSt" # This PDB doesn't exist according to 
-# https://proteopedia.org/wiki/index.php/Believe_It_or_Not#Notes
+# https://proteopedia.org/wiki/index.php/Believe_It_or_Not#Notes & 
+# https://proteopedia.org/wiki/index.php/4tst
 # "4tst is a useful PDB id for a non-existing structure", even if
 # account for case insensitivity. This dummy PDB id code seems better than using 
 # zero in front of alphanumerics as initially did, see footnote to the statement 
