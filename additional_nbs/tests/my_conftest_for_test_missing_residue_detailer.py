@@ -2,13 +2,13 @@
 # this goes in same folder with `conftest.py` that will be for 
 # `test_missing_residue_detailer.py` 
 # `conftest.py` is a special file that pytest automatically finds and uses, but 
-# I don't won't poorly named file so putting most of actual content dictating
+# I don't want poorly named file so putting most of actual content dictating
 # what `conftest.py` should do & generate in here and directing `conftest.py` to
 # utilize this.
 # Note that because it isn't part of the HTML table, I don't bother testing the 
 # top line of the report because I focus on table HTML that is easy to 
 # specifically collect. I ned to set things up so that will be thee case and it
-# is easist to do using conftest step where I am making the output to test.
+# is easiest to do using conftest step where I am making the output to test.
 
 import pytest
 import os
