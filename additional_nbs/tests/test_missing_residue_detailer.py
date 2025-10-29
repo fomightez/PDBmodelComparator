@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 # Compares the results of my `missing_residue_detailer.py` with collected 
 # results from Eric Martz's FirstGlance in Jmol. I had to hand collect the 
 # results from Eric Martz's FirstGlance in Jmol because I thought easier and 
-# more portable to script detailing missing residues myself than use slenium or
+# more portable to script detailing missing residues myself than use selenium or
 # something along those lines to handle getting missing residue information from
 # Eric Martz's FirstGlance in Jmol.
 # Note that because it isn't part of the HTML table, I don't bother testing the 
