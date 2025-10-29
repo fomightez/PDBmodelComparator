@@ -7,7 +7,7 @@
 # utilize this.
 # Note that because it isn't part of the HTML table, I don't bother testing the 
 # top line of the report because I focus on table HTML that is easy to 
-# specifically collect. I ned to set things up so that will be thee case and it
+# specifically collect. I ned to set things up so that will be the case and it
 # is easiest to do using conftest step where I am making the output to test.
 
 import pytest
