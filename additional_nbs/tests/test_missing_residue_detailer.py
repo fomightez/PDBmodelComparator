@@ -25,7 +25,7 @@ from bs4 import BeautifulSoup
 
 # To do yet:
 # -possibly when more mature, update `test_file_can_be_used_as_source` to test
-# it matches the HTML made by `missing_residue_detailer.py ` for 1d66 since that 
+# it matches the HTML made by `missing_residue_detailer.py` for 1d66 since that 
 # header used. For now, `test_file_can_be_used_as_source` just makes sure there
 # is output, which is mostly all that is needed for that test. Mostly.
 
@@ -139,7 +139,7 @@ def test_pytest_working_and_can_pass_fixtures_from_conftest_to_test_file(html_pa
     assert isinstance(text_pairs_to_process, list) 
 
 # This next test tests that a file with the proper name convention can be 
-# supplied as souce of input data as instead of fetching PDB file header from 
+# supplied as souce of input data instead of fetching PDB file header from 
 # Protein Data Bank
 def test_file_can_be_used_as_source(dir_2_put_test_files):  # Add the fixtures as parameters
     # I added later the ability to supply a file as the source the header. This 
