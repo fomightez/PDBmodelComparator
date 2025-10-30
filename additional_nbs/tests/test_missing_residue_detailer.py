@@ -10,7 +10,7 @@ import glob
 import filecmp
 from bs4 import BeautifulSoup
 
-# Run this file while working diretory is at root,
+# Run this file while working directory is at root,
 # like `pytest -v additional_nbs/tests/test_missing_residue_detailer.py` 
 
 # Compares the results of my `missing_residue_detailer.py` with collected 
